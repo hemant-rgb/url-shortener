@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}SnipLink — Shorten Your URLs{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin: 2rem 0 3rem;">
+  <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">
+    Shorten your <span style="color: var(--primary);">links</span> instantly
+  </h1>
+  <p style="color: var(--text-muted); font-size: 1.1rem;">
+    Paste a long URL, get a short one. Track every click.
+  </p>
+</div>
+
+<div class="card">
+  <form method="post" action="/api/shorten" id="shortenForm">
+    <div class="form-group">
+      <label for="url">Destination URL</label>
+      <input type="url" id="url" name="url" placeholder="https://example.com/very/long/url/that/needs/shortening" required>
+    </div>
+    <div class="form-group">
+      <label for="custom_code">Custom alias <span style="color:var(--text-muted)">(optional)</span></label>
+      <div class="form-row">
+        <input type="text" id="custom_code" name="custom_code" placeholder="my-link" class="grow"
+               pattern="[a-zA-Z0-9_-]+" title="Letters, numbers, hyphens, and underscores only">
+        <button type="submit" class="btn btn-primary">Shorten ⚡</button>
+      </div>
+    </div>
+  </form>
+
+  {% if short_url %}
+  <div class="result-box">
+    <p style="color: var(--text-muted); font-size: 0.9rem;">Your short link is ready!</p>
+    <a href="{{ short_url }}" target="_blank" class="short-url">{{ short_url }}</a>
+    <p class="original">→ {{ original_url }}</p>
+    <div style="margin-top: 1rem; display: flex; justify-content: center; gap: 0.75rem;">
+      <button class="copy-btn" onclick="copyLink('{{ short_url }}', this)">📋 Copy</button>
+      <a href="/stats/{{ short_code }}" class="copy-btn" style="border-color: var(--primary); color: var(--primary);">📊 View Stats</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<div class="card" style="text-align: center; border-style: dashed;">
+  <h2 style="font-size: 1.1rem;">🔥 API Access</h2>
+  <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">
+    <code style="background:var(--bg); padding: 0.3rem 0.7rem; border-radius: 6px;">
+      POST /api/shorten {"url": "https://..."} → {"short_url": "..."}
+    </code>
+  </p>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function copyLink(url, btn) {
+  navigator.clipboard.writeText(url).then(() => {
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => btn.textContent = '📋 Copy', 2000);
+  });
+}
+</script>
+{% endblock %}
